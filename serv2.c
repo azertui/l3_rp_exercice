@@ -24,7 +24,7 @@ void verification(struct noeud *nodes, int *nbnode){
   printf("%d noeuds\n",*nbnode);
   for(i=0;i<*nbnode;i++){
     printf("dt=%lf\n",(double)temps-nodes[i].temps);
-    if(temps-nodes[i].temps>10){
+    if(temps-nodes[i].temps>35){
       for(j=i;j<(*nbnode)-1;j++){
         nodes[j]=nodes[j+1];
       }
@@ -45,7 +45,7 @@ int main()
     ssize_t n;
     socklen_t len;
     struct sockaddr_in6 cliaddr, servaddr;
-    char* message = "+(10+2)";
+    char* message = "+(10,2)";
     void sig_chld(int);
 
 
@@ -111,16 +111,25 @@ int main()
 						nbnode++;
 							printf("New %c node added",buffer[0]);
 						printf("Client port: %d\n",cliaddr.sin6_port);
-						printf("Sending response..");
+						/*printf("Sending response..");
             sendto(udpfd, (const char*)message, sizeof(buffer), 0,
                    (struct sockaddr*)&cliaddr, sizeof(cliaddr));
-						printf("Done\n");
+						printf("Done\n");*/
         }
         // if standard input is readable
         if (FD_ISSET(0, &rset)) {
           printf("Message terminal...");
           read(0, buffer, sizeof(buffer));
           printf("%s\n",buffer);
+          //envoit du message au noeud (Un seul conidéré à changer , ne vérifie pas la syntaxe)
+          printf("Sending response..");
+          sendto(udpfd, (const char*)buffer, sizeof(buffer), 0,
+                 (struct sockaddr*)&cliaddr, sizeof(cliaddr));
+          printf("Done\n");
+          buffer[0]='\0';
+          n = recvfrom(udpfd, buffer, sizeof(buffer), 0,(struct sockaddr*)&cliaddr, &len);
+          printf("%s\n","Résultat : " );
+          puts(buffer);
         }
         buffer[0]='\0';
     }

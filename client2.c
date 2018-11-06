@@ -44,7 +44,30 @@ int main()
         close(sockfd);
         exit(1);
     }
-    puts(buffer);
+    //calcul
+    int i=2;
+    int a = 0,b = 0,res = 0;
+    while(buffer[i]!=',' && i<MAXLINE){
+      a *= 10;
+      a += buffer[i] - '0';
+      i++;
+    }
+    i++;
+    printf("%c\n",buffer[i] );
+    while(buffer[i]!=')' && i<MAXLINE){
+      b *= 10;
+      b += buffer[i] - '0';
+      i++;
+    }
+
+    res = a+b;
+    char resS[MAXLINE];
+    snprintf(resS,MAXLINE,"%d",res);
+    printf("Sending..." );
+    sendto(sockfd, resS, MAXLINE,
+           0, (const struct sockaddr*)&servaddr,
+           sizeof(servaddr));
+    printf("Done\n");
     close(sockfd);
     return 0;
 }
