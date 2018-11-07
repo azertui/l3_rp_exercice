@@ -16,7 +16,7 @@ struct noeud
   char op;
   double temps;
 };
-//On retire les noeuds n'ayant pas envoyé de messages depuis plus de 10s
+//On retire les noeuds n'ayant pas envoyé de messages depuis plus de 35s
 void verification(struct noeud *nodes, int *nbnode){
   int i,j;
   double temps=time(NULL);
@@ -122,6 +122,15 @@ int main()
           read(0, buffer, sizeof(buffer));
           printf("%s\n",buffer);
           //envoit du message au noeud (Un seul conidéré à changer , ne vérifie pas la syntaxe)
+          int tmp=0,bonnoeud=0;
+          for (;tmp<nbnode;tmp++){
+            if (nodes[tmp].op == buffer[0]){
+              udpfd.sin6_addr = nodes[tmp].addr;
+              udpfd.sin6_port = nodes[tmp].port;
+              bonnoeud = tmp;
+            }
+          }
+
           printf("Sending response..");
           sendto(udpfd, (const char*)buffer, sizeof(buffer), 0,
                  (struct sockaddr*)&cliaddr, sizeof(cliaddr));
