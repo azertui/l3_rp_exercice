@@ -56,6 +56,11 @@ int main()
 			perror("Server UDP socket()");
 			exit(1);
 		}
+    if((fd_send = socket(AF_INET6, SOCK_DGRAM, 0))==-1)
+		{
+			perror("Server UDP socket()");
+			exit(1);
+		}
     //create server ipv6 addr
     bzero(&servaddr, sizeof(servaddr));
     servaddr.sin6_family = AF_INET6;
@@ -122,24 +127,24 @@ int main()
           read(0, buffer, sizeof(buffer));
           printf("%s\n",buffer);
           //envoit du message au noeud (Un seul conidéré à changer , ne vérifie pas la syntaxe)
-          int tmp=0,bonnoeud=0;
-          for (;tmp<nbnode;tmp++){
-            if (nodes[tmp].op == buffer[0]){
+          int tmp=0;
+          while (nodes[tmp].op != buffer[0] && tmp < nbnode){
+            tmp++;
+          }
+          if(tmp < nbnode){
+          /*  bzero(&udpfd, sizeof(udpfd));
+            bzero(&s_send, sizeof(s_send));
               s_send.sin6_family = AF_INET6;
               s_send.sin6_addr = nodes[tmp].addr;
               s_send.sin6_port = nodes[tmp].port;
-              bzero(&s_send, sizeof(s_send));
               if((bind(fd_send, (struct sockaddr*)&s_send, sizeof(s_send)))==-1)
           		{
           			perror("Server UDP bind()");
           			exit(1);
-          		}
-              bonnoeud = tmp;
-            }
-          }
-
+          		}*/
+              
           printf("Sending response..");
-          sendto(udpfd, (const char*)buffer, sizeof(buffer), 0,
+          sendto(fd_send, (const char*)buffer, sizeof(buffer), 0,
                  (struct sockaddr*)&cliaddr, sizeof(cliaddr));
           printf("Done\n");
           buffer[0]='\0';
@@ -147,6 +152,10 @@ int main()
           printf("%s\n","Résultat : " );
           puts(buffer);
         }
+        else{
+          printf("Aucun noeud disponible\n");
+        }
         buffer[0]='\0';
     }
+  }
 }
