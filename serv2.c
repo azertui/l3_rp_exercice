@@ -39,12 +39,12 @@ int main()
 		int nnodemax=5;
 		struct noeud *nodes=(struct noeud*)malloc(nnodemax*sizeof(struct noeud));
 
-    int udpfd, fd1;
+    int udpfd, fd1, fd_send;
     char buffer[MAXLINE];
     fd_set rset;
     ssize_t n;
     socklen_t len;
-    struct sockaddr_in6 cliaddr, servaddr;
+    struct sockaddr_in6 cliaddr, servaddr,s_send;
     char* message = "+(10,2)";
     void sig_chld(int);
 
@@ -125,8 +125,15 @@ int main()
           int tmp=0,bonnoeud=0;
           for (;tmp<nbnode;tmp++){
             if (nodes[tmp].op == buffer[0]){
-              udpfd.sin6_addr = nodes[tmp].addr;
-              udpfd.sin6_port = nodes[tmp].port;
+              s_send.sin6_family = AF_INET6;
+              s_send.sin6_addr = nodes[tmp].addr;
+              s_send.sin6_port = nodes[tmp].port;
+              bzero(&s_send, sizeof(s_send));
+              if((bind(fd_send, (struct sockaddr*)&s_send, sizeof(s_send)))==-1)
+          		{
+          			perror("Server UDP bind()");
+          			exit(1);
+          		}
               bonnoeud = tmp;
             }
           }
