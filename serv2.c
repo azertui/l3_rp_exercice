@@ -132,19 +132,15 @@ int main()
             tmp++;
           }
           if(tmp < nbnode){
-          /*  bzero(&udpfd, sizeof(udpfd));
+
             bzero(&s_send, sizeof(s_send));
-              s_send.sin6_family = AF_INET6;
-              s_send.sin6_addr = nodes[tmp].addr;
-              s_send.sin6_port = nodes[tmp].port;
-              if((bind(fd_send, (struct sockaddr*)&s_send, sizeof(s_send)))==-1)
-          		{
-          			perror("Server UDP bind()");
-          			exit(1);
-          		}*/
-              
+              cliaddr.sin6_family = AF_INET6;
+              cliaddr.sin6_addr = nodes[tmp].addr;
+              cliaddr.sin6_port = nodes[tmp].port;
+
+
           printf("Sending response..");
-          sendto(fd_send, (const char*)buffer, sizeof(buffer), 0,
+          sendto(udpfd, (const char*)buffer, sizeof(buffer), 0,
                  (struct sockaddr*)&cliaddr, sizeof(cliaddr));
           printf("Done\n");
           buffer[0]='\0';
