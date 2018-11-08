@@ -48,7 +48,6 @@ void verification(struct noeud *nodes, int *nbnode){
   char calcul[MAXLINE];
   double temps=time(NULL);
   for(i=0;i<*nbnode;i++){
-    printf("%c use=%d\n",nodes[i].op,nodes[i].hascalc );
     //si pas de réponse depuis 35s
     if(temps-nodes[i].temps>35){
       if(nodes[i].hascalc){
@@ -78,8 +77,6 @@ void verification(struct noeud *nodes, int *nbnode){
         printf("vérif: Aucun noeud disponible pour retransmettre l'opération %s\n", calcul);
     }
   }
-  printf("\n");
-  printf("%d noeuds\n",*nbnode);
 }
 
 int main()
@@ -124,7 +121,6 @@ int main()
 
     fd1 = udpfd + 1;
     for (;;) {
-				printf("Waiting..\n");
         // set udpfd in readset
         FD_SET(udpfd, &rset);
         FD_SET(0, &rset); //add standard input
@@ -139,7 +135,6 @@ int main()
         if (FD_ISSET(udpfd, &rset)) {
             len = sizeof(cliaddr);
             bzero(buffer, sizeof(buffer));
-            //printf("Message from UDP client: ");
             n = recvfrom(udpfd, buffer, sizeof(buffer), 0,
             (struct sockaddr*)&cliaddr, &len);
 						if(n<=0){
@@ -182,7 +177,6 @@ int main()
           //envoit du message au noeud (Un seul conidéré à changer , ne vérifie pas la syntaxe)
           int tmp=0;
           while ((nodes[tmp].hascalc || nodes[tmp].op != buffer[0]) && tmp < nbnode){
-            printf("\nboucle%d\n",tmp);
             tmp++;
           }
 
