@@ -147,7 +147,6 @@ int main()
 								close(udpfd);
 								exit(1);
 						}
-						//puts(buffer);
 						if(nbnode==nnodemax){
 							nnodemax+=5;
 							nodes= (struct noeud*) realloc(nodes,
@@ -176,42 +175,25 @@ int main()
                 }
               }
             }
-							//printf("New %c node added",buffer[0]);
-						//printf("Client port: %d\n",cliaddr.sin6_port);
-						/*printf("Sending response..");
-            sendto(udpfd, (const char*)message, sizeof(buffer), 0,
-                   (struct sockaddr*)&cliaddr, sizeof(cliaddr));
-						printf("Done\n");*/
         }
         // if standard input is readable
         if (FD_ISSET(0, &rset)) {
           read(0, buffer, sizeof(buffer));
-          //printf("%s\n",buffer);
           //envoit du message au noeud (Un seul conidéré à changer , ne vérifie pas la syntaxe)
           int tmp=0;
-          while (nodes[tmp].hascalc && nodes[tmp].op != buffer[0] && tmp < nbnode){
+          while ((nodes[tmp].hascalc || nodes[tmp].op != buffer[0]) && tmp < nbnode){
             printf("\nboucle%d\n",tmp);
             tmp++;
           }
 
-          if(tmp < nbnode && !(nodes[tmp].hascalc)){
+          if(tmp < nbnode && !(nodes[tmp].hascalc) && nodes[tmp].op == buffer[0]){
             cliaddr.sin6_family = AF_INET6;
             cliaddr.sin6_addr = nodes[tmp].addr;
             cliaddr.sin6_port = nodes[tmp].port;
             strncpy(nodes[tmp].calcul,buffer,strlen(buffer));
             nodes[tmp].hascalc=1;
-            printf("Sending response..");
             sendto(udpfd, (const char*)buffer, sizeof(buffer), 0, (struct sockaddr*)&cliaddr, sizeof(cliaddr));
-            printf("Done\n");
             memset(buffer,'\0',sizeof(buffer));
-          /*n = recvfrom(udpfd, buffer, sizeof(buffer), 0,(struct sockaddr*)&cliaddr, &len);
-          if(n<=0){
-              perror("recvfrom()");
-              close(udpfd);
-              exit(1);
-          }
-          printf("%s\n","Résultat : " );
-          puts(buffer);*/
         }
         else{
           printf("Aucun noeud disponible\n");
