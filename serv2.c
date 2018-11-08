@@ -16,12 +16,19 @@ struct noeud
   char op;
   double temps;
 };
+
+int existence(struct noeud *nodes, int nbnode,struct in6_addr addr, int port){
+  int i;
+  for(i=0;i<nbnode;i++){
+    if(nodes[i].port ==port)
+      return 1;
+  }
+  return 0;
+}
 //On retire les noeuds n'ayant pas envoyé de messages depuis plus de 35s
 void verification(struct noeud *nodes, int *nbnode){
   int i,j;
   double temps=time(NULL);
-  printf("\n");
-  printf("%d noeuds\n",*nbnode);
   for(i=0;i<*nbnode;i++){
     printf("dt=%lf\n",(double)temps-nodes[i].temps);
     if(temps-nodes[i].temps>35){
@@ -31,6 +38,8 @@ void verification(struct noeud *nodes, int *nbnode){
       (*nbnode)--;
     }
   }
+  printf("\n");
+  printf("%d noeuds\n",*nbnode);
 }
 
 int main()
@@ -45,7 +54,6 @@ int main()
     ssize_t n;
     socklen_t len;
     struct sockaddr_in6 cliaddr, servaddr,s_send;
-    char* message = "+(10,2)";
     void sig_chld(int);
 
 
@@ -93,14 +101,14 @@ int main()
         if (FD_ISSET(udpfd, &rset)) {
             len = sizeof(cliaddr);
             bzero(buffer, sizeof(buffer));
-            printf("Message from UDP client: ");
+            //printf("Message from UDP client: ");
             n = recvfrom(udpfd, buffer, sizeof(buffer), 0,(struct sockaddr*)&cliaddr, &len);
 						if(n<=0){
 								perror("recvfrom()");
 								close(udpfd);
 								exit(1);
 						}
-						puts(buffer);
+						//puts(buffer);
 						if(nbnode==nnodemax){
 							nnodemax+=5;
 							nodes= (struct noeud*) realloc(nodes,nnodemax*sizeof(struct noeud));
@@ -109,13 +117,14 @@ int main()
 								exit(1);
 							}
 						}
+            nodes[nbnode].temps=time(NULL);
+            if(!existence(nodes,nbnode,cliaddr.sin6_addr,cliaddr.sin6_port)){
 						nodes[nbnode].addr=cliaddr.sin6_addr;
 						nodes[nbnode].port=cliaddr.sin6_port;
             nodes[nbnode].op=buffer[0];
-            nodes[nbnode].temps=time(NULL);
-						nbnode++;
-							printf("New %c node added",buffer[0]);
-						printf("Client port: %d\n",cliaddr.sin6_port);
+						nbnode++;}
+							//printf("New %c node added",buffer[0]);
+						//printf("Client port: %d\n",cliaddr.sin6_port);
 						/*printf("Sending response..");
             sendto(udpfd, (const char*)message, sizeof(buffer), 0,
                    (struct sockaddr*)&cliaddr, sizeof(cliaddr));
@@ -125,25 +134,23 @@ int main()
         if (FD_ISSET(0, &rset)) {
           printf("Message terminal...");
           read(0, buffer, sizeof(buffer));
-          printf("%s\n",buffer);
+          //printf("%s\n",buffer);
           //envoit du message au noeud (Un seul conidéré à changer , ne vérifie pas la syntaxe)
           int tmp=0;
           while (nodes[tmp].op != buffer[0] && tmp < nbnode){
             tmp++;
           }
           if(tmp < nbnode){
-
             bzero(&s_send, sizeof(s_send));
               cliaddr.sin6_family = AF_INET6;
               cliaddr.sin6_addr = nodes[tmp].addr;
               cliaddr.sin6_port = nodes[tmp].port;
 
-
           printf("Sending response..");
           sendto(udpfd, (const char*)buffer, sizeof(buffer), 0,
                  (struct sockaddr*)&cliaddr, sizeof(cliaddr));
           printf("Done\n");
-          buffer[0]='\0';
+          memset(buffer,'\0',sizeof(buffer));
           n = recvfrom(udpfd, buffer, sizeof(buffer), 0,(struct sockaddr*)&cliaddr, &len);
           printf("%s\n","Résultat : " );
           puts(buffer);
@@ -151,7 +158,7 @@ int main()
         else{
           printf("Aucun noeud disponible\n");
         }
-        buffer[0]='\0';
+        memset(buffer,'\0',sizeof(buffer));
     }
   }
 }

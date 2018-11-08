@@ -42,7 +42,7 @@ int main()
     for (;;) {
     // send hello message to server
     //printf("Sending..." );
-    sendto(sockfd, "+", strlen("+"),
+    sendto(sockfd, "*", strlen("*"),
            0, (const struct sockaddr*)&servaddr,
            sizeof(servaddr));
     //printf("Done\n");
@@ -55,7 +55,7 @@ int main()
         exit(1);
     }
     //calcul
-      printf("%s\n",buffer );
+    else if(errno != EAGAIN){
       int i=2;
       int a = 0,b = 0,res = 0;
       while(buffer[i]!=',' && i<MAXLINE){
@@ -64,23 +64,23 @@ int main()
       i++;
     }
     i++;
+    printf("%c\n",buffer[i] );
     while(buffer[i]!=')' && i<MAXLINE){
       b *= 10;
       b += buffer[i] - '0';
       i++;
     }
-    //printf("%d\n",a);
-    //printf("%d\n",b);
-    res = a+b;
+
+    res = a*b;
     char resS[MAXLINE];
     snprintf(resS,MAXLINE,"%d",res);
-    printf("%s\n",resS );
     printf("Sending..." );
     sendto(sockfd, resS, MAXLINE,
            0, (const struct sockaddr*)&servaddr,
            sizeof(servaddr));
     printf("Done\n");
 
+  }
 }
     close(sockfd);
     return 0;
