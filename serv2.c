@@ -189,11 +189,12 @@ int main()
           //printf("%s\n",buffer);
           //envoit du message au noeud (Un seul conidéré à changer , ne vérifie pas la syntaxe)
           int tmp=0;
+          printf("%c\n",buffer[0] );
           while (nodes[tmp].hascalc && nodes[tmp].op != buffer[0] && tmp < nbnode){
             printf("\nboucle%d\n",tmp);
             tmp++;
           }
-
+          printf("num : %d\n", tmp );
           if(tmp < nbnode && !(nodes[tmp].hascalc)){
             cliaddr.sin6_family = AF_INET6;
             cliaddr.sin6_addr = nodes[tmp].addr;
@@ -201,6 +202,7 @@ int main()
             strncpy(nodes[tmp].calcul,buffer,strlen(buffer));
             nodes[tmp].hascalc=1;
             printf("Sending response..");
+            printf("%s\n",buffer );
             sendto(udpfd, (const char*)buffer, sizeof(buffer), 0, (struct sockaddr*)&cliaddr, sizeof(cliaddr));
             printf("Done\n");
             memset(buffer,'\0',sizeof(buffer));
