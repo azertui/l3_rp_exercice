@@ -73,6 +73,8 @@ int main()
         if(buffer[i]=='+')
           i++;
         while(buffer[i]!=',' && i<strlen(buffer)){
+          if (buffer[i]<'0' || buffer[i]>'9')
+            erreur=1;
           a *= 10;
           a += buffer[i] - '0';
           i++;
@@ -89,6 +91,8 @@ int main()
       if(buffer[i]=='+')
         i++;
       while(buffer[i]!=')' && i<strlen(buffer)){
+        if (buffer[i]<'0' || buffer[i]>'9')
+          erreur=1;
         b *= 10;
         b += buffer[i] - '0';
         i++;
