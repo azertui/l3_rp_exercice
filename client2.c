@@ -61,25 +61,55 @@ int main()
       calcul=1;
     //calcul
     if(calcul){
-        printf("%s\n",buffer );
+      char resS[MAXLINE];
         int i=2;
-        int a = 0,b = 0,res = 0;
-        while(buffer[i]!=',' && i<MAXLINE){
+        int a = 0,b = 0,res = 0,erreur=0,moins=0;
+        if(buffer[i-1]!='(')
+          erreur=1;
+        if(buffer[i]=='-'){
+          moins=1;
+          i++;
+        }
+        if(buffer[i]=='+')
+          i++;
+        while(buffer[i]!=',' && i<strlen(buffer)){
           a *= 10;
           a += buffer[i] - '0';
           i++;
         }
       i++;
-      while(buffer[i]!=')' && i<MAXLINE){
+      if(moins)
+        a = 0-a;
+      moins = 0;
+      if(buffer[i]=='-'){
+        moins=1;
+        i++;
+      }
+
+      if(buffer[i]=='+')
+        i++;
+      while(buffer[i]!=')' && i<strlen(buffer)){
         b *= 10;
         b += buffer[i] - '0';
         i++;
       }
-      //printf("%d\n",a);
-      //printf("%d\n",b);
-      res = a+b;
-      char resS[MAXLINE];
-      snprintf(resS,MAXLINE,"%d",res);
+      if(moins)
+        b = 0-b;
+      if(i>=strlen(buffer))
+        erreur=1;
+
+      if (erreur==1){
+        resS[0] = 'E';
+        resS[1] = 'R';
+        resS[2] = 'R';
+        resS[3] = 'E';
+        resS[4] = 'U';
+        resS[5] = 'R';
+        resS[6] = '\0';}
+      else{
+        res = a+b;
+        snprintf(resS,MAXLINE,"%d",res);
+      }
       usleep((rand()%16)*1000000);
       printf("%s\n",resS );
       printf("Sending..." );
